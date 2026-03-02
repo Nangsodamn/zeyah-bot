@@ -7,7 +7,7 @@ import { shuffle } from "@zeyah-utils";
 export const QuizEvent = module.register({
   emoji: "💬",
   name: "quiz",
-  version: "2.0.0",
+  version: "2.0.1",
   author: "@lianecagara",
   description: "Answer trivia. Earn points.",
 
@@ -52,14 +52,20 @@ export const QuizEvent = module.register({
         <Code>Reply with A / B / C / D (30s)</Code>
       </>,
     );
+    let done = false;
 
     await dispatched.listenReplies({ timeout: 30000 });
+    setTimeout(() => {
+      if (done) return;
+      zeyahIO.unsend(dispatched);
+    }, 30000);
 
     dispatched.on("reply", async (_io, replyEv) => {
       const answer = replyEv.body.trim().toUpperCase();
       const index = letters.indexOf(answer);
 
       if (index === -1) return;
+      done = true;
 
       dispatched.stopListenReplies();
 

@@ -7,7 +7,7 @@ import yts from "yt-search";
 export const YTH = module.register({
   emoji: "🎧",
   name: "music",
-  version: "1.0.1",
+  version: "1.0.2",
   author: ["@lianecagara", "@Jonell-Magallanes"],
   pluginNames: [],
   description: "Play and Download Youtube Music",
@@ -63,13 +63,10 @@ export const YTH = module.register({
         </>,
       )
       .setAttachments([{ name: "music.mp3", stream: audio.stream }]);
-    const author = event.senderID;
 
-    musicMessage.listenReplies({ timeout: 5 * 1000 });
+    await musicMessage.listenReplies({ timeout: 5 * 60 * 1000 });
     musicMessage.on("reply", async (zeyahIO, event) => {
-      const { body, senderID } = event;
-
-      if (senderID !== author) return;
+      const { body } = event;
 
       const message = body.toLowerCase().trim();
 

@@ -29,11 +29,18 @@ export class UserDB extends ZeyahDB<UserDBProps> {
 
   async getPoints(): Promise<Decimal> {
     const result = (await this.get("decimalJSPoints")) ?? "0";
-    return new Decimal(result);
+    let r = new Decimal(result);
+    if (r.isNaN()) {
+      return Decimal(0);
+    }
+    return r;
   }
 
   async setPoints(decimal: Decimal): Promise<void> {
     if (decimal instanceof Decimal) {
+      if (decimal.isNaN()) {
+        throw new Error("Cannot set a NaN Decimal() money.");
+      }
       await this.set("decimalJSPoints", decimal.toString());
     } else {
       throw new Error("Cannot set a non Decimal() money.");

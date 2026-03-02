@@ -24,6 +24,10 @@ export const SlotEvent = module.register({
 
   async onCommand({ zeyahIO, event, args, userDB: user }) {
     const [betRaw] = args;
+    if (!betRaw) {
+      await zeyahIO.reply("💸 Enter a bet as argument 2.");
+      return;
+    }
 
     const [slotWins, points] = await parallel(
       user.getDecimal("slotWins"),
@@ -31,7 +35,7 @@ export const SlotEvent = module.register({
     );
     const bet = parseBetDecimal(betRaw, points);
 
-    if (!bet || bet.lte(0)) {
+    if (!bet || bet.lte(0) || bet.isNaN()) {
       await zeyahIO.reply(<ResWrongInput />);
       return;
     }
