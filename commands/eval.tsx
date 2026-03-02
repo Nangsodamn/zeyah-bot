@@ -7,7 +7,7 @@ import * as Comps from "@zeyah-bot/components";
 import { Inspect } from "@zeyah-bot/components";
 
 export const Eval = module.register({
-  emoji: "🤣",
+  emoji: "🔥",
   name: "eval",
   role: 2,
   version: "1.0.2",
