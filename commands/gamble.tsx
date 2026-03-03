@@ -1,6 +1,6 @@
 import { Bold, Code, Italic } from "@kayelaa/zeyah";
-import { ZeyahAdapter } from "@zeyah-bot/adapters/base";
 import { Points } from "@zeyah-bot/components";
+import { ZeyahIO } from "@zeyah-bot/domain/io";
 import { biasedRandom, randomInt } from "@zeyah-utils";
 import Decimal from "decimal.js";
 
@@ -32,9 +32,7 @@ export const GambleEvent = module.register({
 
     const decayMap = new Map<"SAFE" | "RISKY" | "GAMBLE", number>();
 
-    const startListener = async (
-      listener: ZeyahAdapter.NoPromiseZeyahDispatched,
-    ) => {
+    const startListener = async (listener: ZeyahIO.Result) => {
       listener.listenReplies({ timeout: 30000 });
 
       listener.on("reply", async (_io, ev) => {

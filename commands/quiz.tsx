@@ -2,7 +2,7 @@ import { Bold, Code } from "@kayelaa/zeyah";
 import { Breaks, Choice, Lang, Points, Random } from "@zeyah-bot/components";
 import Decimal from "decimal.js";
 import axios from "axios";
-import { shuffle } from "@zeyah-utils";
+import { Inventory, shuffle } from "@zeyah-utils";
 
 export const QuizEvent = module.register({
   emoji: "💬",

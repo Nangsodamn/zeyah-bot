@@ -239,6 +239,47 @@ export namespace ZeyahAdapter {
       this.resolveInternal(this);
     }
 
+    waitFor<K extends keyof DispatchedEventMap>(
+      timeout: number,
+      type: K,
+    ): Promise<DispatchedEventMap[K]>;
+    waitFor<
+      K extends keyof DispatchedEventMap,
+      I extends TupleIndexes<DispatchedEventMap[K]>,
+    >(timeout: number, type: K, index: I): Promise<DispatchedEventMap[K][I]>;
+    waitFor<
+      K extends keyof DispatchedEventMap,
+      I extends TupleIndexes<DispatchedEventMap[K]>,
+    >(
+      timeout: number,
+      type: K,
+      index?: I,
+    ): Promise<DispatchedEventMap[K][I]> | Promise<DispatchedEventMap[K]> {
+      const r = Promise.withResolvers<
+        DispatchedEventMap[K][I] | DispatchedEventMap[K]
+      >();
+      let done = false;
+      const handle = (
+        ...args: DispatchedEventMap[keyof DispatchedEventMap]
+      ) => {
+        done = true;
+        const numIndex = Number(index);
+        const resTo = !isNaN(numIndex) ? args.at(numIndex) : args;
+        r.resolve(resTo as DispatchedEventMap[K][I] | DispatchedEventMap[K]);
+        this.off(type, handle);
+      };
+      setTimeout(() => {
+        if (!done) {
+          this.off(type, handle);
+          r.reject(new Error("Timeout reached."));
+        }
+      }, timeout);
+      this.on(type, handle);
+      return r.promise as
+        | Promise<DispatchedEventMap[K][I]>
+        | Promise<DispatchedEventMap[K]>;
+    }
+
     public async listenReplies({ timeout }: { timeout: number }) {
       await this;
       this.onListenReply({ timeout });
@@ -285,3 +326,8 @@ export namespace ZeyahAdapter {
     return { ...form };
   }
 }
+
+export type TupleIndexes<T extends readonly unknown[]> = Exclude<
+  keyof T,
+  keyof any[]
+>;

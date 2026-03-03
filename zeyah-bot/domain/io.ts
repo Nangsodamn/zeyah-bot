@@ -765,4 +765,6 @@ export namespace ZeyahIO {
       return this.logMessageData.ADMIN_EVENT === "remove_admin";
     }
   }
+
+  export interface Result extends ZeyahAdapter.NoPromiseZeyahDispatched {}
 }

@@ -2,8 +2,8 @@ import Zeyah, { Bold, Code, Text } from "@kayelaa/zeyah";
 import { Breaks, Choice, Random, Points } from "@zeyah-bot/components";
 import Decimal from "decimal.js";
 import { Cell, TictactoeAI } from "@commands/utils/ttt-ai";
-import { ZeyahAdapter } from "@zeyah-bot/adapters/base";
 import { pickRandom, shuffle } from "@zeyah-utils";
+import { ZeyahIO } from "@zeyah-bot/domain/io";
 
 export const TttEvent = module.register({
   emoji: "⭕",
@@ -55,9 +55,7 @@ export const TttEvent = module.register({
 
     const renderBoard = () => ai.toString();
 
-    const startReplyListener = async (
-      listener: ZeyahAdapter.NoPromiseZeyahDispatched,
-    ) => {
+    const startReplyListener = async (listener: ZeyahIO.Result) => {
       listener.listenReplies({ timeout: 30 * 1000 });
       listener.on("reply", async (_io, ev) => {
         listener.stopListenReplies();
