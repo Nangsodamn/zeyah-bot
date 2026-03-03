@@ -258,7 +258,8 @@ export async function handleCommand(
       return;
     }
     try {
-      await command.onCommand?.(ctxCmd);
+      const handle = normalizeOnCommand(command.onCommand);
+      await handle?.(ctxCmd);
     } catch (error) {
       logger.error(error, "Handle Command");
     }
@@ -321,6 +322,15 @@ export async function handleCommand(
       </>,
     );
   }
+}
+
+export function normalizeOnCommand(onCommand: ZeyahCMD<any>["onCommand"]) {
+  if ("runInContext" in onCommand && typeof onCommand !== "function") {
+    return (ctx: ZeyahCMDCTX) => {
+      return ctx.runContextual(onCommand);
+    };
+  }
+  return onCommand;
 }
 
 export function findCommandOLD(commands: ZeyahCMD<any>[], commandName: string) {

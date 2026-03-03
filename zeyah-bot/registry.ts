@@ -70,9 +70,21 @@ export type CommandNameWithVersion = `${string}@${SemVerLiteral}`;
 const commands = new Map<CommandNameWithVersion, ZeyahCMD<any>>();
 
 /**
+ * **RegisterMode** is a string literal union and an actual runtime array from **@zeyah-bot/registry** that is used as a 2nd parameter for {@link register} method.
+ *
+ * **strict**: Throws exception when registering a command and version that already exists in the registry.
+ * **replace**: It will not matter whether the command with the same name and version exists, latest call wins.
+ * **ignore**: Just ignore when it already exists instead of throwing an exception.
+ */
+export type RegisterMode = (typeof RegisterMode)[number];
+export const RegisterMode = ["strict", "replace", "ignore"] as const;
+
+/**
  * **register()** is a method from **@zeyah-bot/registry** that allows a developer to register their custom **commands** to the system.
  *
  * Each 'register' call will **register** a command to a dedicated **internal map**, the return value can be discarded but it's best to export it.
+ *
+ * The second argument will be the **mode of register**, check {@link RegisterMode} for reference. Defaults to **strict**.
  *
  * To get the commands, use {@link getCallableCommands}.
  *
@@ -80,8 +92,16 @@ const commands = new Map<CommandNameWithVersion, ZeyahCMD<any>>();
  *
  * *(Jsdoc fully written by lianecagara)*
  */
-export function register<T extends ValidPluginNames>(cmd: ZeyahCMD<T>): void;
-export function register<T extends ValidPluginNames>(cmd: ZeyahCMD<T>): void {
+export function register<T extends ValidPluginNames>(
+  cmd: ZeyahCMD<T>,
+  mode: RegisterMode = "strict",
+): void {
+  if (!RegisterMode.includes(mode)) {
+    throw new Error(
+      `Invalid RegisterMode. Expected ${RegisterMode.join(", ")}`,
+    );
+  }
+  const isMode = (...requested: RegisterMode[]) => requested.includes(mode);
   const normalAuthor = (
     Array.isArray(cmd.author) ? [...cmd.author] : [cmd.author]
   ).filter(Boolean);
@@ -89,6 +109,14 @@ export function register<T extends ValidPluginNames>(cmd: ZeyahCMD<T>): void {
     throw new Error("Command must have at least one author.");
   }
   cmd.pluginNames ??= [] as unknown as readonly [...T];
+  if (!cmd.name) {
+    throw new Error("Command must have a name");
+  }
+  if (!cmd.version || !SemanticVersion.isValid(cmd.version)) {
+    throw new Error(
+      "The version is either missing or does not satisfy the format of 'number.number.number' or semantic versioning. Example: '1.0.2'",
+    );
+  }
   if (cmd.pluginNames.some((i) => !Plugins.some((p) => p.pluginName === i))) {
     throw new Error(
       `Some plugins this command requests doesnt exist in our plugin registry.`,
@@ -99,11 +127,7 @@ export function register<T extends ValidPluginNames>(cmd: ZeyahCMD<T>): void {
       "The command authors must be a github username with '@' prefix. Example: '@lianecagara'",
     );
   }
-  if (!cmd.version || !SemanticVersion.isValid(cmd.version)) {
-    throw new Error(
-      "The version is either missing or does not satisfy the format of 'number.number.number' or semantic versioning. Example: '1.0.2'",
-    );
-  }
+
   if (!cmd.emoji) {
     throw new Error("The emoji property is required.");
   }
@@ -116,14 +140,19 @@ export function register<T extends ValidPluginNames>(cmd: ZeyahCMD<T>): void {
       "Some argument guide in the command is malformed, each arg guide could start and end with <, > or [, ] respectively.",
     );
   }
-  if (!cmd.name) {
-    throw new Error("Command must have a name");
-  }
+
   if (!cmd.onCommand && !cmd.onEvent && !cmd.onMessage) {
     throw new Error(`Command "${cmd.name}" has no handlers`);
   }
   if (getCommandByVersion(cmd.name, cmd.version)) {
-    throw new Error(`Duplicate command version: ${cmd.name}`);
+    if (isMode("strict")) {
+      throw new Error(`Duplicate command version: ${cmd.name}`);
+    } else if (isMode("ignore")) {
+      logger.loader(
+        `${cmd.name}@${cmd.version} | Ignored (Duplicate command version.)`,
+      );
+      return;
+    }
   }
 
   const key = cmd.name;

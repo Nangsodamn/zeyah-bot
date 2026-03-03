@@ -149,7 +149,9 @@ export interface ZeyahCMD<PluginNames extends ValidPluginNames = []> {
    *
    * For the properties available in the **ctx**, refer to {@link ZeyahCMDCTX}
    */
-  onCommand?(ctx: OnCommandCTX<PluginNames>): Promise<any>;
+  onCommand?:
+    | ((ctx: OnCommandCTX<PluginNames>) => Promise<any>)
+    | Interact.Contextual;
   /**
    * This is the **onEvent** handle.
    *

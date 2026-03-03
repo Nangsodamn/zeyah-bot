@@ -13,6 +13,8 @@ import Decimal from "decimal.js";
 import { ZeyahCMDCTX } from "@zeyah-bot/types";
 import { parseBetDecimal } from "@zeyah-utils";
 
+export const CredixMenu = new Menu();
+
 export const CredixCommand = module.register({
   emoji: "💎",
   name: "credix",
@@ -21,9 +23,7 @@ export const CredixCommand = module.register({
   description: "Credix financial intelligence dashboard.",
   pluginNames: [],
   aliases: ["bank", "crdix", "cdx", "b"],
-  async onCommand(ctx) {
-    ctx.runContextual(CredixMenu);
-  },
+  onCommand: CredixMenu,
 });
 
 export const CredixDesign: Zeyah.FC<PropsWithInfo> = ({ childrenString }) => {
@@ -57,8 +57,6 @@ export const CredixDesign: Zeyah.FC<PropsWithInfo> = ({ childrenString }) => {
     </>
   );
 };
-
-export const CredixMenu = new Menu();
 
 CredixMenu.ShowMenuComponent = CredixDesign;
 
