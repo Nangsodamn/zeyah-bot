@@ -7,8 +7,8 @@
   "author": "Kayelaa Cagara",
   "type": "commonjs",
   "scripts": {
-    "start": "npm run check && tsx zeyah-bot/main",
-    "start-nocheck": "tsx zeyah-bot/main",
+    "start": "npm run check && tsx zeyah-bot/index",
+    "start-nocheck": "tsx zeyah-bot/index",
     "check": "tsc --project tsconfig.commands.json",
     "update": "bash updater.sh"
   },
