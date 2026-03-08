@@ -988,6 +988,8 @@ export type TypeMap = {
   number: number;
   boolean: boolean;
   function: Function;
+  "arrow-function": Function;
+  "non-arrow-function": Function;
   null: null;
   object: object;
   undefined: undefined;
@@ -1046,6 +1048,12 @@ export function isType<D extends TypeDescriptor>(
 
     case "boolean":
       return typeof value === "boolean";
+
+    case "arrow-function":
+      return typeof value === "function" && !value.prototype;
+
+    case "non-arrow-function":
+      return typeof value === "function" && value.prototype;
 
     case "function":
       return typeof value === "function";
@@ -1121,6 +1129,8 @@ export function getType(value: any): TypeDescriptor | "unknown" {
     "string",
     "number",
     "boolean",
+    "arrow-function",
+    "non-arrow-function",
     "function",
     "null",
     "object",
