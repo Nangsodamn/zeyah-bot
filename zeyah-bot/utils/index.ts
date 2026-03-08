@@ -879,6 +879,7 @@ export class ReflectiveMap<T extends AnyObject> implements Map<
     }
   }
 
+  // @ts-ignore
   forEach(
     callbackfn: <K extends keyof T>(
       value: T[K],
@@ -1183,4 +1184,13 @@ export function typeMustBeOptional(
   if (value === undefined) return;
 
   typeMustBe(value, ...descriptors);
+}
+
+export namespace DateNow {
+  export function ms(): number {
+    return Temporal.Now.instant().epochMilliseconds;
+  }
+  export function ns(): bigint {
+    return Temporal.Now.instant().epochNanoseconds;
+  }
 }
