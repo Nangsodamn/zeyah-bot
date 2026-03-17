@@ -14,7 +14,7 @@ export default defineConfig({
   prefixes: [process.env.PREFIX ?? "+"],
   useDiscord: true,
   useFacebook: true,
-  mongoURI: "mongodb+srv://nangmwa02_db_user:adrianng02@cluster0.gryyebx.mongodb.net/zeyahbot?appName=Cluster0",
+  mongoURI: "mongodb+srv://nangmwa02_db_user:adrianng02@cluster0.gryebx.mongodb.net/zeyahbot?appName=Cluster0",
   discordToken: process.env.DISCORD_TOKEN ?? "",
   plugins: [sixSevenPlugin, menuHandlePlugin],
   pluginConfig: {
