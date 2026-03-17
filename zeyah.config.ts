@@ -6,14 +6,14 @@ import { menuHandlePlugin } from "./checked/menu-handle.js";
 export default defineConfig({
   DESIGN: {
     Title: "Zeyah",
-    Admin: "YOUR_NAME",
+    Admin: "Nang AI",
     Theme: "retro",
   },
   adminBot: ["1234346521881739307", "100075058221244"],
   moderatorBot: [],
   prefixes: [process.env.PREFIX ?? "+"],
   useDiscord: true,
-  useFacebook: process.env.FB_STATE ? true : false,
+  useFacebook: true,
   discordToken: process.env.DISCORD_TOKEN ?? "",
   plugins: [sixSevenPlugin, menuHandlePlugin],
   pluginConfig: {
