@@ -7,7 +7,7 @@
   "author": "Kayelaa Cagara",
   "type": "module",
   "scripts": {
-    "start": "npm run check && npm run start-nocheck",
+    "start": "npm run start-nocheck",
     "start-nocheck": "tsx zeyah-bot/index",
     "check": "tsc --project tsconfig.commands.json",
     "update": "bash updater.sh"
