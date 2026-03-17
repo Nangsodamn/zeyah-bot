@@ -42,6 +42,15 @@ export class Ws3FBAdapter extends ZeyahAdapter {
     this.internalAPI = api;
 
     this.repliesMap = new Map<string, Ws3FBDispatched>();
+
+    setInterval(() => {
+  try {
+    this.internalAPI.getCurrentUserID();
+    console.log("[KEEP ALIVE] connected");
+  } catch (e) {
+    console.log("[KEEP ALIVE ERROR]", e);
+  }
+}, 60 * 1000);
   }
 
   handleReplies(e: ZeyahInferredEvent) {
