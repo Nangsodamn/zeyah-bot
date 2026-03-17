@@ -72,50 +72,58 @@ export class Ws3FBAdapter extends ZeyahAdapter {
     });
   }
 
-  onStartListen(): void {
-    // console.log(
-    //   Object.fromEntries(
-    //     Object.entries(this.internalAPI).map(([k, v]) => [k, String(v)]),
-    //   ),
-    // );
-    this.on("event", (e) => {
-      this.handleReplies(e);
-    });
-    (this.internalAPI.listenMqtt as API["listen"])((err, event_) => {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      if (isEqual(event_.type, "message", "message_reply" as "message")) {
-        const event = event_ as Extract<ListenEvent, { type: "message" }>;
-        this.triggerEvent({
-          body: event.body,
-          mentions: Object.fromEntries(Object.entries(event.mentions)),
-          messageID: event.messageID,
-          messageReply: event.messageReply
-            ? {
-                body: event.messageReply.body,
-                messageID: event.messageReply.messageID,
-                mentions: null,
-                senderID: event.messageReply.senderID,
-                threadID: null,
-                type: "message",
-                extras: new Map(),
-              }
-            : null,
-          threadID: event.threadID,
-          senderID: event.senderID,
-          type: event.messageReply ? "message_reply" : "message",
-          extras: new Map(),
-        } satisfies ZeyahMessageOrReply);
-      } else {
-        this.triggerEvent({
-          ...event_,
-          extras: new Map(),
-        } as any);
-      }
-    });
-  }
+onStartListen(): void {
+  const startListening = () => {
+    console.log("[FB] Listening...");
+
+    try {
+      this.internalAPI.listenMqtt((err, event_) => {
+        if (err) {
+          console.error("[FB ERROR]", err);
+          console.log("[FB] Reconnecting in 5 seconds...");
+          setTimeout(startListening, 5000);
+          return;
+        }
+
+        if (isEqual(event_.type, "message", "message_reply" as "message")) {
+          const event = event_ as any;
+
+          this.triggerEvent({
+            body: event.body,
+            mentions: Object.fromEntries(Object.entries(event.mentions || {})),
+            messageID: event.messageID,
+            messageReply: event.messageReply
+              ? {
+                  body: event.messageReply.body,
+                  messageID: event.messageReply.messageID,
+                  mentions: null,
+                  senderID: event.messageReply.senderID,
+                  threadID: null,
+                  type: "message",
+                  extras: new Map(),
+                }
+              : null,
+            threadID: event.threadID,
+            senderID: event.senderID,
+            type: event.messageReply ? "message_reply" : "message",
+            extras: new Map(),
+          });
+        } else {
+          this.triggerEvent({
+            ...event_,
+            extras: new Map(),
+          } as any);
+        }
+      });
+    } catch (err) {
+      console.error("[CRASH]", err);
+      console.log("[FB] Restarting listener in 5 seconds...");
+      setTimeout(startListening, 5000);
+    }
+  };
+
+  startListening();
+}
   onStopListen(): void {
     throw new Error("I cant stop sorry.");
   }
