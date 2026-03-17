@@ -2,7 +2,7 @@ import { defineConfig } from "@zeyah-bot/registry";
 import "dotenv/config";
 import { sixSevenPlugin } from "./checked/sixSeven-plugin.js";
 import { menuHandlePlugin } from "./checked/menu-handle.js";
-
+autoReconnect: true,
 export default defineConfig({
   DESIGN: {
     Title: "Zeyah",
