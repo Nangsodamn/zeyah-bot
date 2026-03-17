@@ -72,8 +72,18 @@ export class Ws3FBAdapter extends ZeyahAdapter {
     return new Promise<Ws3FBAdapter>((res, rej) => {
       login(credentials, options, (err, api) => {
         if (err) {
-          return rej(err);
-        }
+  console.error("[LOGIN ERROR]", err);
+
+  console.log("[BOT] Re-login in 10 seconds...");
+  setTimeout(() => {
+    Ws3FBAdapter.fromLogin(credentials, options)
+      .then(res)
+      .catch(rej);
+  }, 10000);
+
+  return;
+        } 
+        
         const inst = new Ws3FBAdapter(api);
         res(inst);
         return;
